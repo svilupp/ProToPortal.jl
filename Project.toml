@@ -1,0 +1,24 @@
+name = "ProToPortal"
+uuid = "f9496bd6-a3bb-4afc-927d-7268532ebfa9"
+authors = ["J S <49557684+svilupp@users.noreply.github.com> and contributors"]
+version = "0.1.0-DEV"
+
+[deps]
+GenieFramework = "a59fdf5c-6bf0-4f5d-949c-a137c9e2f353"
+GenieSession = "03cc5b98-4f21-4eb6-99f2-22eced81f962"
+PromptingTools = "670122d1-24a8-4d70-bfce-740807c42192"
+
+[compat]
+Aqua = "0.7"
+GenieFramework = "2.1"
+GenieSession = "1"
+PromptingTools = "0.23"
+Test = "<0.0.1, 1"
+julia = "1.10"
+
+[extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Aqua", "Test"]

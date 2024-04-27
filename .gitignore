@@ -1,0 +1,13 @@
+*.jl.*.cov
+*.jl.cov
+*.jl.mem
+/Manifest.toml
+/docs/Manifest.toml
+/docs/build/
+
+config/**
+log/**
+chat_history/**
+**/.DS_Store
+.vscode/**
+_*.jl
