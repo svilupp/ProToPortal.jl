@@ -4,7 +4,7 @@ layout: home
 
 hero:
   name: ProToPortal.jl
-  tagline: The Portal to Magic of PromptingTools and Julia-first LLM Coding.
+  tagline: The Portal to the Magic of PromptingTools and Julia-first LLM Coding.
   description: Enhance your productivity with streamlined code automation and intuitive prompt management for Julia.
   image:
     src: https://img.icons8.com/dusk/128/portal.png

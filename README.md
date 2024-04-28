@@ -1,4 +1,4 @@
-# ProToPortal.jl 
+# ProToPortal.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://svilupp.github.io/ProToPortal.jl/stable/) 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://svilupp.github.io/ProToPortal.jl/dev/) 
@@ -7,7 +7,7 @@
 [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
-Welcome to **ProToPortal**, your portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl)! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
+Welcome to **ProToPortal**, the portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl) and Julia-first LLM coding! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
 
 Given it's a UI-rich application, it will contain many bugs I'm unaware of—let me know! 
 
