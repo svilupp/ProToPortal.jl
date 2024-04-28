@@ -43,7 +43,11 @@ const HISTORY_SAVE = true
     @in model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
     @in model_input = ""
     @in model_submit = false
-    @out model_options = ["gpt4t", "gpt3t", "gllama3", "gllama370"]
+    ## gllama3 - Llama3 8b on Groq, gllama370 - Llama3 70b on Groq, 
+    ## claude-x are Opus/Sonnet/Haiku from Anthropic Claude3, tmixtral is Mixtral 8x7b on Together.ai, 
+    ## ollama3 is Llama3 8b on Ollama
+    @out model_options = ["gpt4t", "gpt3t", "gllama3", "gllama370",
+        "ollama3", "claudeo", "claudes", "claudeh", "tmixtral"]
     @in system_prompt = "You are a helpful assistant."
     @in chat_temperature = 0.7
     @in chat_code_eval = false
