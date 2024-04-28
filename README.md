@@ -1,4 +1,4 @@
-# ProToPortal.jl 
+# ProToPortal.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://svilupp.github.io/ProToPortal.jl/stable/) 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://svilupp.github.io/ProToPortal.jl/dev/) 
@@ -7,7 +7,7 @@
 [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
 
-Welcome to **ProToPortal**, your portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl)! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
+Welcome to **ProToPortal**, the portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl) and Julia-first LLM coding! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
 
 Given it's a UI-rich application, it will contain many bugs I'm unaware of—let me know! 
 
@@ -41,6 +41,9 @@ For the purists: simply run `julia --project -t auto main.jl` in your terminal (
 
 How to start? Type `Say hi!` in the question box on the Chat tab and click Submit (or press CTRL+ENTER).
 
+**Preview:**
+![preview plain mode](docs/src/videos/screen-capture-plain.gif)
+
 ## Motivation
 
 Imagine you're walking your dog and suddenly come up with a brilliant idea for a code snippet you need urgently. 
@@ -48,6 +51,8 @@ Imagine you're walking your dog and suddenly come up with a brilliant idea for a
 Using ChatGPT on your phone is feasible, but slow and cumbersome—typing out or dictating a precise prompt can be a real hassle, not to mention you can't close the app or run the code to see if it works. 
 
 Enter **ProToPortal**: Select the JuliaExpertAsk template, use speech-to-text on your phone to dictate your needs, enable auto-fixing with Monte-Carlo Tree Search (`airetry!`), and watch as your phone processes 6 iterations of the code before ChatGPT generates its first response!
+
+For a preview, see the video: `docs/src/videos/screen-capture-code-fixing.mp4`
 
 ## Key Highlights
 

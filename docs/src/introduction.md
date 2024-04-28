@@ -36,6 +36,9 @@ For the purists: simply run `julia --project -t auto main.jl` in your terminal (
 
 How to start? Type `Say hi!` in the question box on the Chat tab and click Submit (or press CTRL+ENTER).
 
+**Preview:**
+![preview plain mode](videos/screen-capture-plain.gif)
+
 ## Motivation
 
 Imagine you're walking your dog and suddenly come up with a brilliant idea for a code snippet you need urgently. 
@@ -43,6 +46,8 @@ Imagine you're walking your dog and suddenly come up with a brilliant idea for a
 Using ChatGPT on your phone is feasible, but slow and cumbersome—typing out or dictating a precise prompt can be a real hassle, not to mention you can't close the app or run the code to see if it works. 
 
 Enter **ProToPortal**: Select the JuliaExpertAsk template, use speech-to-text on your phone to dictate your needs, enable auto-fixing with Monte-Carlo Tree Search (`airetry!`), and watch as your phone processes 6 iterations of the code before ChatGPT generates its first response!
+
+For a preview, see the video: `docs/src/videos/screen-capture-code-fixing.mp4`
 
 ## Key Highlights
 
