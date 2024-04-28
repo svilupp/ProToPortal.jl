@@ -9,7 +9,9 @@
 
 Welcome to **ProToPortal**, your portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl)! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
 
-Given it's a UI-rich application, it will contain many bugs I'm unaware of—let me know!
+Given it's a UI-rich application, it will contain many bugs I'm unaware of—let me know! 
+
+Scroll to the bottom to see some screenshots.
 
 > [!WARNING]
 > This application is still in development. Use at your own risk.
@@ -91,6 +93,17 @@ Enter **ProToPortal**: Select the JuliaExpertAsk template, use speech-to-text on
 - Modify the default system prompt used when not employing a template.
 
 And rich logging in the REPL to see what the GUI is doing under the hood!
+
+## Screenshots
+
+Very simple chat interface, easy to use on the phone!
+![chat interface](docs/src/assets/screenshot1.png)
+
+Many templates are available, allowing you to save keystrokes.
+![templates](docs/src/assets/screenshot2.png)
+
+Advanced settings - evaluate code, automatically critique or fix your Julia code.
+![advanced settings](docs/src/assets/screenshot3.png)
 
 ## Alternatives
 
