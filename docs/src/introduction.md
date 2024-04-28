@@ -1,17 +1,13 @@
-# ProToPortal.jl 
+```@meta
+CurrentModule = ProToPortal
+```
+# ProToPortal
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://svilupp.github.io/ProToPortal.jl/stable/) 
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://svilupp.github.io/ProToPortal.jl/dev/) 
-[![Build Status](https://github.com/svilupp/ProToPortal.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/svilupp/ProToPortal.jl/actions/workflows/CI.yml?query=branch%3Amain)
-[![Coverage](https://codecov.io/gh/svilupp/ProToPortal.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/svilupp/ProToPortal.jl)
-[![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
-[![SciML Code Style](https://img.shields.io/static/v1?label=code%20style&message=SciML&color=9558b2&labelColor=389826)](https://github.com/SciML/SciMLStyle)
+Documentation for [ProToPortal](https://github.com/svilupp/ProToPortal.jl).
 
 Welcome to **ProToPortal**, your portal to the magic of [PromptingTools.jl](https://github.com/svilupp/PromptingTools.jl)! ProToPortal is a personal project designed to enhance productivity, potentially yours too!
 
-Given it's a UI-rich application, it will contain many bugs I'm unaware of—let me know! 
-
-Scroll to the bottom to see some screenshots.
+Given it's a UI-rich application, it will contain many bugs I'm unaware of — let me know!
 
 > [!WARNING]
 > This application is still in development. Use at your own risk.
@@ -28,7 +24,6 @@ using Pkg; Pkg.activate("."); Pkg.instantiate(".")
 ```
 
 3. Launch the GUI
-
 ```julia
 # as a quick hack if you don't have your environment variables set up, run the below line with your OpenAI key
 # ENV["OPENAI_API_KEY"] = "<your_openai_api_key>"
@@ -94,17 +89,6 @@ Enter **ProToPortal**: Select the JuliaExpertAsk template, use speech-to-text on
 
 And rich logging in the REPL to see what the GUI is doing under the hood!
 
-## Screenshots
-
-Very simple chat interface, easy to use on the phone!
-![chat interface](docs/src/assets/screenshot1.png)
-
-Many templates are available, allowing you to save keystrokes.
-![templates](docs/src/assets/screenshot2.png)
-
-Advanced settings - evaluate code, automatically critique or fix your Julia code.
-![advanced settings](docs/src/assets/screenshot3.png)
-
 ## Alternatives
 
 ProToPortal is a simple personal project and it cannot compete with established LLM GUIs! 
@@ -118,11 +102,6 @@ If you're looking for more robust software, consider the following tools:
 
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**. Please open an issue first, because this is first and foremost a simple tool to interact with LLMs on-the-go.
 
-## License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
 ## Acknowledgments
 
 This project would not be possible without the amazing [Stipple.jl](https://github.com/GenieFramework/Stipple.jl) from the [Genie.jl](https://github.com/GenieFramework/Genie.jl) family! It's just a Stipple.jl wrapper around PromptingTools.jl.
-

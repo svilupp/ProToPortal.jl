@@ -9,4 +9,6 @@ CurrentModule = ProToPortal
 
 ```@autodocs
 Modules = [ProToPortal]
+Pages   = ["components.jl", "llm.jl", "utils.jl"]
 ```
+
