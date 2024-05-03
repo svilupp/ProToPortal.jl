@@ -1,7 +1,7 @@
 name = "ProToPortal"
 uuid = "f9496bd6-a3bb-4afc-927d-7268532ebfa9"
 authors = ["J S <49557684+svilupp@users.noreply.github.com> and contributors"]
-version = "0.1.0"
+version = "0.2.0-DEV"
 
 [deps]
 GenieFramework = "a59fdf5c-6bf0-4f5d-949c-a137c9e2f353"

@@ -12,9 +12,10 @@ using GenieFramework.Genie.Requests: postpayload
 Stipple.Layout.add_script("https://cdn.tailwindcss.com")
 
 #! CONFIGURATION
-const HISTORY_DIR = joinpath(@__DIR__, "chat_history")
+# Change if you want to save conversations to a specific folder
+const HISTORY_DIR = get(ENV, "PROTO_HISTORY_DIR", joinpath(@__DIR__, "chat_history"))
 # Change if you don't want to auto-save conversations (after clicking "New chat")
-const HISTORY_SAVE = true
+const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
 
 @appname Portal
 
@@ -78,6 +79,7 @@ const HISTORY_SAVE = true
     @in chat_submit = false
     @in chat_reset = false
     @in chat_rm_last_msg = false
+    @in chat_fork = false
     # Template browser
     @in template_filter = ""
     @in template_submit = false
@@ -91,6 +93,7 @@ const HISTORY_SAVE = true
     # Dashboard logic
     @onchange isready begin
         @info "> Dashboard is ready!"
+        isdir(HISTORY_DIR) || mkpath(HISTORY_DIR)
     end
     @onbutton model_submit begin
         if !isempty(model_input)
@@ -224,6 +227,12 @@ const HISTORY_SAVE = true
         pop!(conv_displayed)
         conv_displayed = conv_displayed
     end
+    @onbutton chat_fork begin
+        @info "> Forking conversation (reset+load)!"
+        conv_displayed_temp = deepcopy(conv_displayed)
+        chat_reset = true
+        conv_displayed = conv_displayed_temp
+    end
     ### Template browsing behavior
     @onbutton template_submit begin
         @info "> Template filter: $template_filter"
@@ -261,8 +270,32 @@ end
 ## TODO: add cost tracking on configuration pages + token tracking
 ## TODO: add RAG/knowledge loading from folder or URL
 # Required for the JS events
+
+# set focus to the first variable when it changes
+@watch begin
+    raw"""
+    chat_template_variables() {
+      this.$nextTick(() => {
+        this.$refs.variables[0].focus();
+      })
+    }
+
+    """
+end
 @methods begin
     raw"""
+    buttonFunc(index) {
+        console.log("buttonFunc",index);
+        console.log("length", this.conv_displayed.length);
+        if (this.conv_displayed.length==index) {
+            console.log("woowza");
+        }
+    },
+    focusTemplateSelect() {
+        this.$nextTick(() => {
+            this.$refs.tpl_select.focus();
+        });
+    },
     filterFn (val, update) {
         if (val === '') {
             update(() => {
@@ -271,7 +304,6 @@ end
             })
             return
         }
-
         update(() => {
             // filter down based on user provided input
             const needle = val.toLowerCase()
