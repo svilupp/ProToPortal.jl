@@ -3,7 +3,6 @@ function tab_chat()
     # Note: tab_chat blocks are defined separately in src/view_chat.jl
     [
         h3("Chat"),
-        tab_chat_settings(),
         tab_chat_templates(),
         separator(@iif("!!conv_displayed.length")),
         tab_chat_messages(),
@@ -53,8 +52,9 @@ function tab_templates()
         ),
     ]
 end
-function tab_config()
-    [h3("Configuration"),
+function tab_model_settings()
+    [
+            p("Model", class = "text-lg text-weight-bold "),
         row(class="col-6",select(:model, options = :model_options, label = "Model")),
         row(class="col-6 pb-5",textfield("Add a new model", :model_input, hint="Confirm with ENTER",@on("keyup.enter", "model_submit = !model_submit"))),
         separator(),
@@ -64,6 +64,13 @@ function tab_config()
         ## TODO: stats - tokens + cost
         
         ]
+end
+
+function tab_config()
+    [h3("Configuration"),
+    Html.div(class="mt-5",@iif("selected_page == 'config-model'"),tab_model_settings()),
+    Html.div(class="mt-5",@iif("selected_page == 'config-chat'"),tab_chat_settings())
+    ]
 end
 
 ## Page Container
@@ -105,21 +112,28 @@ function ui()
                                 itemsection(avatar = true, icon("bolt")),
                                 itemsection("Templates")
                             ]),
-                        item(clickable = "", vripple = "",
-                            @click("selected_page = 'config'"),
-                            [
-                                itemsection(avatar = true, icon("settings")),
-                                itemsection("Configuration")
-                            ])
+                        expansionitem( label="Configuration", icon="settings", [
+                                      item(clickable = "", vripple = "",
+                                           @click("selected_page = 'config-model'"),
+                                           [
+                                            itemsection(class="pl-10","Model")
+                                           ]),
+                                      item(clickable = "", vripple = "",
+                                           @click("selected_page = 'config-chat'"),
+                                           [
+                                            itemsection(class="pl-10","Chat")
+                                           ])
+                                     ]
+                                     )
                     ]
                 )),
             page_container(class = "mx-8",
                 [
-                    Html.div(class = "", @iif("selected_page == 'chat'"), tab_chat()),
-                    Html.div(class = "", @iif("selected_page == 'history'"), tab_history()),
+                    Html.div(class = "w-4/5 ml-auto mr-auto", @iif("selected_page == 'chat'"), tab_chat()),
+                    Html.div(class = "w-4/5 ml-auto mr-auto", @iif("selected_page == 'history'"), tab_history()),
                     Html.div(
-                        class = "", @iif("selected_page == 'templates'"), tab_templates()),
-                    Html.div(class = "", @iif("selected_page == 'config'"), tab_config())]),
+                       class = "w-4/5 ml-auto mr-auto", @iif("selected_page == 'templates'"), tab_templates()),
+                    Html.div(class = "w-4/5 ml-auto mr-auto", @iif("selected_page.includes('config')"), tab_config())]),
                     
                     quasar(:footer,reveal=true,bordered=false,class="bg-white text-primary text-caption text-center",
                     [
