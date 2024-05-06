@@ -1,7 +1,7 @@
 "Prepares the conversation for sending to the LLM"
 function prepare_conversation(
         display::Vector{Dict{Symbol, Any}}, placeholders::Vector{Dict{
-            Symbol, Any}};
+            Symbol, Any}} = Vector{Dict{Symbol, Any}}();
         question::String = "", template::String = "", system_prompt::String = "")
     conv = render_messages(display, placeholders)
     if template != ""
@@ -28,15 +28,16 @@ function prepare_conversation(
 end
 
 "Code evaluator. Returns the evaluted code block (AICode) and the feedback string."
-function evaluate_code(conv::AbstractVector{<:PT.AbstractMessage}; prefix = "")
-    @info "> Evaluating code"
+function evaluate_code(conv::AbstractVector{<:PT.AbstractMessage};
+        prefix::String = "", header::String = "## Code Evaluation")
+    @info ">> Evaluating code"
     cb = AICode(
         last(conv); prefix, skip_unsafe = true, capture_stdout = true)
-    @info "> Code Success: $(isvalid(cb))"
+    @info ">> Code Success: $(isvalid(cb))"
 
     ### Build the response
     io = IOBuffer()
-    println(io, "## Code Evaluation", "\n")
+    println(io, header, "\n")
     if isvalid(cb)
         println(io, "**Outcome:** Code is valid", "\n")
         println(io, "**Output:**\n $(cb.stdout)", "\n")
@@ -48,6 +49,13 @@ function evaluate_code(conv::AbstractVector{<:PT.AbstractMessage}; prefix = "")
     end
     feedback = String(take!(io))
     return cb, feedback
+end
+
+# Convenience function for evaluating code from string
+# AIMessage is the better input because it handles code extraction with a few fallbacks!
+function evaluate_code(str::AbstractString;
+        prefix::String = "", header::String = "## Code Evaluation")
+    evaluate_code([PT.AIMessage(str)]; prefix, header)
 end
 
 "Constructs AIGenerate call that mimics if it was just executed"
@@ -81,6 +89,14 @@ function send_to_model(
         conv::AbstractVector{<:PT.AbstractMessage}; model::String, temperature::Float64 = 0.7)
     @info ">> Sending $(length(conv)) messages to LLM with temp $temperature"
     result = aigenerate(conv; model, api_kwargs = (; temperature), return_all = true)
+    return result
+end
+"Sends the conversation to the LLM."
+function send_to_model(
+        any_template::Symbol; model::String, temperature::Float64 = 0.7, kwargs...)
+    @info ">> Sending AITemplate $(any_template) to LLM with temp $temperature"
+    result = aigenerate(
+        any_template; model, api_kwargs = (; temperature), return_all = true, kwargs...)
     return result
 end
 "Sends the conversation to the Auto-Critic Template for evaluation and suggestions"

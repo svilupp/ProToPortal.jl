@@ -141,7 +141,7 @@ function tab_chat_input()
                 type = "textarea",
                 ## change to multi-line text area
                 @on("keyup.enter.ctrl",
-                    "chat_submit = !chat_submit")),
+                    "chat_submit = true")),
             cell(class = "flex",
                 [
                     btn("Submit", @click(:chat_submit), disable = :chat_submit),

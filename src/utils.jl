@@ -90,7 +90,7 @@ function update_message!(display::Dict{Symbol, Any})
 end
 
 "Returns rendered messages, check if messages need updating as we might have changed the `display`"
-function render_messages(display, placeholders)
+function render_messages(display, placeholders = Vector{Dict{Symbol, Any}}())
     ## shortcut if empty
     isempty(display) && return PT.AbstractMessage[]
 
