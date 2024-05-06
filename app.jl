@@ -41,6 +41,9 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in selected_page = "chat"
     @in ministate = true
     # configuration
+    ## @in chat_tracker_tokens_in = 0
+    ## @in chat_tracker_tokens_out = 0
+    ## @in chat_tracker_cost = 0.0
     @in model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
     @in model_input = ""
     @in model_submit = false
@@ -80,6 +83,15 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in chat_reset = false
     @in chat_rm_last_msg = false
     @in chat_fork = false
+    # Meta Prompting
+    @in meta_submit = false
+    @in meta_reset = false
+    @in meta_disabled = false
+    @in meta_question = ""
+    @in meta_rounds_max = 5
+    @in meta_rounds_current = 0
+    @in meta_displayed = Dict{Symbol, Any}[]
+    @in meta_rm_last_msg = false
     # Template browser
     @in template_filter = ""
     @in template_submit = false
@@ -118,23 +130,10 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     end
     @onbutton chat_reset begin
         @info "> Chat Reset!"
-        timestamp = Dates.format(now(), "YYYYmmdd_HHMMSS")
-        name = "Conv. @ $timestamp"
-        ## update the chat with edits by the user
-        conv_rendered = render_messages(conv_displayed, chat_template_variables)
-        # Conv. display is already up-to-date, no need to update it!
-        label = label_conversation(conv_rendered; model = model)
-        if HISTORY_SAVE
-            label_clean = replace(label, r"[:\s\"]+" => "_") |> lowercase
-            ## save to disk + to chat history
-            path = joinpath(
-                HISTORY_DIR, "conversation__$(timestamp)__$(label_clean).json")
-            PT.save_conversation(path, conv_rendered)
-            @info "> Chat saved to $path"
-        end
-        history = push!(history,
-            Dict(:name => name, :label => label, :messages => conv_rendered))
-
+        record = save_conversation(
+            conv_displayed; save = HISTORY_SAVE, save_path = HISTORY_DIR,
+            variables = chat_template_variables, model = model)
+        history = push!(history, record)
         ## clean the chat
         conv_displayed = empty!(conv_displayed)
         chat_template_variables = empty!(chat_template_variables)
@@ -142,8 +141,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         chat_disabled, chat_advanced_expanded, chat_template_expanded = false, false, false
         # set defaults again
         chat_code_airetry, chat_code_eval = false, false
-        chat_code_prefix = ""
-        chat_temperature = 0.7
+        chat_code_prefix, chat_temperature = "", 0.7
     end
     @onbutton chat_submit begin
         chat_disabled = true
@@ -233,6 +231,47 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         chat_reset = true
         conv_displayed = conv_displayed_temp
     end
+    ### Meta-prompting
+    @onbutton meta_submit begin
+        meta_disabled = true
+        if meta_rounds_current < meta_rounds_max
+            # we skip prepare_conversation to avoid create user+system prompt when we start, just grab the messages
+            conv_current = render_messages(meta_displayed)
+            while meta_rounds_current < meta_rounds_max
+                meta_rounds_current = meta_rounds_current + 1
+                ## update conv, but indicate if it's final_answer
+                early_stop, conv_current = meta_prompt_step!(
+                    conv_current; counter = meta_rounds_current, model = model, question = meta_question)
+                meta_displayed = [msg2display(msg; id)
+                                  for (id, msg) in enumerate(conv_current)]
+                early_stop && break
+            end
+        elseif meta_question != ""
+            @info "> Meta-prompting follow up question!"
+            conv = prepare_conversation(meta_displayed; question = meta_question)
+            conv_current = send_to_model(conv; model = model)
+            meta_displayed = [msg2display(msg; id)
+                              for (id, msg) in enumerate(conv_current)]
+        end
+        meta_disabled, meta_question = false, ""
+    end
+    @onbutton meta_reset begin
+        @info "> Meta-Prompting Reset!"
+        record = save_conversation(
+            meta_displayed; save = HISTORY_SAVE, save_path = HISTORY_DIR,
+            model = model, file_prefix = "conversation__meta")
+        history = push!(history, record)
+        ## clean the messages
+        meta_rounds_current = 0
+        meta_displayed = empty!(meta_displayed)
+        meta_disabled, meta_question, meta_rounds_current = false, "", 0
+    end
+    @onbutton meta_rm_last_msg begin
+        @info "> Deleting last turn!"
+        meta_rounds_current = meta_rounds_current - 1
+        pop!(meta_displayed)
+        meta_displayed = meta_displayed
+    end
     ### Template browsing behavior
     @onbutton template_submit begin
         @info "> Template filter: $template_filter"
@@ -296,7 +335,7 @@ end
             this.$refs.tpl_select.focus();
         });
     },
-    filterFn (val, update) {
+    filterFn(val, update) {
         if (val === '') {
             update(() => {
             // reset to full option list
@@ -310,7 +349,7 @@ end
             this.chat_template_options = this.chat_template_options_all.filter(v => v.toLowerCase().indexOf(needle) > -1)
         })
         },
-    filterFnAuto (val, update) {
+    filterFnAuto(val, update) {
         if (val === '') {
             update(() => {
             // reset to full option list
@@ -325,9 +364,20 @@ end
             this.chat_auto_template_options = this.chat_auto_template_options_all.filter(v => v.toLowerCase().indexOf(needle) > -1)
         })
         },
-    copyToClipboard: function(index) {
-        console.log(index);
+    copyToClipboard(index) {
         const str = this.conv_displayed[index].content; // extract the content of the element in position `index`
+        const el = document.createElement('textarea');  // Create a <textarea> element
+        el.value = str;                                 // Set its value to the string that you want copied
+        el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+        el.style.position = 'absolute';                 
+        el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+        document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+        el.select();                                    // Select the <textarea> content
+        document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+        document.body.removeChild(el);                  // Remove the <textarea> element
+    },
+    copyToClipboardMeta(index) {
+        const str = this.meta_displayed[index].content; // extract the content of the element in position `index`
         const el = document.createElement('textarea');  // Create a <textarea> element
         el.value = str;                                 // Set its value to the string that you want copied
         el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof

@@ -1,9 +1,10 @@
 module ProToPortal
 
+using Dates
 using PromptingTools
 const PT = PromptingTools
 using PromptingTools: JSON3
-using PromptingTools: AICode, last_message, last_output
+using PromptingTools: AICode, last_message, last_output, save_conversation
 using PromptingTools.Experimental.AgentTools: aicodefixer_feedback, airetry!, AICall,
                                               AIGenerate
 const AT = PromptingTools.Experimental.AgentTools
@@ -21,6 +22,9 @@ export render_messages, render_template_messages
 export conversation2transcript, parse_critic, load_conversations_from_dir
 include("utils.jl")
 
+export save_conversation
+include("serialization.jl")
+
 export flash, flash_has_message
 include("flash.jl")
 
@@ -28,6 +32,7 @@ export messagecard, templatecard
 include("components.jl")
 
 include("view_chat.jl")
+include("view_meta.jl")
 
 export ui, ui_login
 include("view.jl")
@@ -38,6 +43,9 @@ include("authentication.jl")
 export send_to_model, prepare_conversation, label_conversation, evaluate_code
 export build_lazy_aicall, autofix_code
 include("llm.jl")
+
+export meta_prompt_step!
+include("meta_prompting.jl")
 
 function __init__()
     ## Load extra templates

@@ -11,13 +11,24 @@ function tab_chat()
         tab_chat_input()
     ]
 end
+function tab_meta()
+    [
+        h3("Meta-Prompting"),
+        tab_meta_settings(),
+        separator(@iif("!!meta_displayed.length")),
+        tab_meta_messages(),
+        separator(@iif("!!meta_displayed.length")),
+        tab_meta_input()
+    ]
+end
 function tab_history()
     [
         h3("History of Old Conversations"),
-        col(class="flex",btn("Reload from Disk",@click(:history_reload), icon = "refresh")),
+        col(class = "flex",
+            btn("Reload from Disk", @click(:history_reload), icon = "refresh")),
         separator(),
         list(@for("(item, index) in history"),
-            key=R"item.id",
+            key = R"item.id",
             item(
                 [item_section(icon("chat"), :avatar)
                  item_section("{{item.name}} {{item.label}}")],
@@ -31,16 +42,17 @@ function tab_history()
             messagecard("{{item.content}}", title = "{{item.title}}")
         ),
         cell(class = "flex",
-        [
-            btn("Fork the conversation", @click(:history_fork), class="btn btn-secondary"),
-        ])
+            [
+                btn("Fork the conversation", @click(:history_fork),
+                class = "btn btn-secondary")
+            ])
     ]
 end
 function tab_templates()
     [
         h3("Template Browser"),
         textfield("Filter keywords", :template_filter,
-            clearable = true,class="mb-4",
+            clearable = true, class = "mb-4",
             @on("keyup.enter",
                 "template_submit = !template_submit")),
         separator(),
@@ -50,25 +62,26 @@ function tab_templates()
                 metadata = "Version: {{item.version}}, Wordcount: {{item.wordcount}}, Placeholders: {{item.variables}}",
                 system = "{{item.system_preview}}", user = "{{item.user_preview}}")
             ]
-        ),
+        )
     ]
 end
 function tab_config()
     [h3("Configuration"),
-        row(class="col-6",select(:model, options = :model_options, label = "Model")),
-        row(class="col-6 pb-5",textfield("Add a new model", :model_input, hint="Confirm with ENTER",@on("keyup.enter", "model_submit = !model_submit"))),
+        row(class = "col-6", select(:model, options = :model_options, label = "Model")),
+        row(class = "col-6 pb-5",
+            textfield("Add a new model", :model_input, hint = "Confirm with ENTER",
+                @on("keyup.enter", "model_submit = !model_submit"))),
         separator(),
         cell([
-            textfield("Default System Prompt",:system_prompt, hint="Will be sent to the AI model as the first instruction.")
-        ]),
-        ## TODO: stats - tokens + cost
-        
-        ]
+            textfield("Default System Prompt", :system_prompt,
+            hint = "Will be sent to the AI model as the first instruction.")
+        ])        ## TODO: stats - tokens + cost
+    ]
 end
 
 ## Page Container
 function ui()
-    layout(view = "hHh Lpr lff",title="ProToPortal", head_content = "",
+    layout(view = "hHh Lpr lff", title = "ProToPortal", head_content = "",
         [
             Genie.Assets.favicon_support(),
             ##    
@@ -110,52 +123,64 @@ function ui()
                             [
                                 itemsection(avatar = true, icon("settings")),
                                 itemsection("Configuration")
+                            ]),
+                        item([itemsection(avatar = true, icon("science")),
+                            itemsection("EXPERIMENTAL")]),
+                        item(
+                            clickable = "", vripple = "", @click("selected_page = 'meta'"),
+                            [
+                                itemsection(avatar = true, icon("groups")),
+                                itemsection("Meta-Prompting")
                             ])
                     ]
                 )),
             page_container(class = "mx-8",
                 [
                     Html.div(class = "", @iif("selected_page == 'chat'"), tab_chat()),
+                    Html.div(class = "", @iif("selected_page == 'meta'"), tab_meta()),
                     Html.div(class = "", @iif("selected_page == 'history'"), tab_history()),
                     Html.div(
                         class = "", @iif("selected_page == 'templates'"), tab_templates()),
-                    Html.div(class = "", @iif("selected_page == 'config'"), tab_config())]),
-                    
-                    quasar(:footer,reveal=true,bordered=false,class="bg-white text-primary text-caption text-center",
-                    [
-                    p([span("Powered by "), a(href="https://github.com/GenieFramework/Stipple.jl","Stipple.jl from the GenieFramework. "),
-                    span("Icons by "), a(href="https://icons8.com/about","Icons8")]),
-                    ])
-            ##
+                    Html.div(class = "", @iif("selected_page == 'config'"), tab_config())
+                ]),
+            quasar(:footer, reveal = true, bordered = false,
+                class = "bg-white text-primary text-caption text-center",
+                [
+                    p([span("Powered by "),
+                    a(href = "https://github.com/GenieFramework/Stipple.jl",
+                        "Stipple.jl from the GenieFramework. "),
+                    span("Icons by "), a(href = "https://icons8.com/about", "Icons8")])
+                ])            ##
         ])
 end
 
 function ui_login()
-    flash_string = flash_has_message() ?  "<div class=\"form-group alert alert-info\">$(flash())</div>" : ""
+    flash_string = flash_has_message() ?
+                   "<div class=\"form-group alert alert-info\">$(flash())</div>" : ""
 
-"""
-<h1 class="display-3">Login</h1>
+    """
+    <h1 class="display-3">Login</h1>
 
-<div class="bs-callout bs-callout-primary">
-    <p>
-    Please authenticate in order to access the information.
-    </p>
-</div>
-
-$flash_string
-
-<form method="POST" action="/login" class="" enctype="multipart/form-data">
-    <div class="form-group">
-    <label _for="auth_username">Username</label>
-    <input type="text" id="auth_username" name="username" class="form-control" placeholder="User" />
+    <div class="bs-callout bs-callout-primary">
+        <p>
+        Please authenticate in order to access the information.
+        </p>
     </div>
 
-    <div class="form-group">
-    <label _for="auth_password">Password</label>
-    <input type="password" id="auth_password" name="password" class="form-control" placeholder="Password" />
-    </div>
+    $flash_string
 
-    <input type="submit" value="Login" class="btn btn-primary" />
-</form>
-"""
+    <form method="POST" action="/login" class="" enctype="multipart/form-data">
+        <div class="form-group">
+        <label _for="auth_username">Username</label>
+        <input type="text" id="auth_username" name="username" class="form-control" placeholder="User" />
+        </div>
+
+        <div class="form-group">
+        <label _for="auth_password">Password</label>
+        <input type="password" id="auth_password" name="password" class="form-control" placeholder="Password" />
+        </div>
+
+        <input type="submit" value="Login" class="btn btn-primary" />
+    </form>
+    """
 end
