@@ -26,6 +26,21 @@ function parse_critic(msg::PT.AIMessage)
     return suggestions, early_stop
 end
 
+"Parses prompt builder's response to get the instructions and inputs"
+function parse_builder(msg::PT.AIMessage)
+    ## Extract the suggestions
+    instructions = match(r"<Instructions>([\s\S]*?)</Instructions>"ms, msg.content)
+    inputs = match(r"<Inputs>([\s\S]*?)</Inputs>"ms, msg.content)
+    if !isnothing(instructions) && !isnothing(inputs)
+        instructions = strip(instructions.captures[1])
+        inputs = strip(inputs.captures[1])
+    else
+        instructions = msg.content
+        inputs = "Proceed with the task."
+    end
+    return instructions, inputs
+end
+
 ###
 
 role4display(::PT.SystemMessage) = "System Instructions"

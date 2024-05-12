@@ -8,15 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+## [0.2.0]
+
+### Added
+
 Chat tab
-- added delete icon to the last message in the conversation (for easy deletion)
-- added a button in "Advanced Settings" to "Fork a conversation" (save to history for reference, but continue from a fresh copy)
-- added a focus when a template is selected (on expand, on template selection, etc)
+- Added delete icon to the last message in the conversation (for easy deletion)
+- Added a button in "Advanced Settings" to "Fork a conversation" (save to history for reference, but continue from a fresh copy)
+- Added a focus when a template is selected (on expand, on template selection, etc)
+- Added a little edit icon for messages (disables the q-popup-edit that was distracting and jumping out too often)
+- Added speech-to-text for the chat (click Record/Stop -> it will paste the text into the chat input and copy it in your clipboard)
 
 Meta-prompting tab
-- Add an experimental meta-prompting experience based on [arxiv](https://arxiv.org/pdf/2401.12954). See the tab "Meta-Prompting" for more details.
+- Added an experimental meta-prompting experience based on [arxiv](https://arxiv.org/pdf/2401.12954). See the tab "Meta-Prompting" for more details.
 
-### Fixed
+Prompt Builder tab
+- Added a tab to generate "prompt templates" that you can then "Apply In Chat" (it jumps to the chat tab and provides template variables to fill in)
+- Allows selecting different models (eg, Opus or more powerful ones) and defining how many samples are provided to give you a choice
 
 ## [0.1.0]
 

@@ -85,17 +85,32 @@ For a preview, see the video: `docs/src/videos/screen-capture-code-fixing.mp4`
   - Start "new chat" with conversations automatically saved both on disk and in history.
 
 ### History Tab
+
 - Browse and load past conversations with a simple click.
 - Fork past conversations for continued exploration without altering the original history.
 - View the current session or reload to fetch all saved conversations.
 
 ### Templates Tab
+
 - Explore all available templates with previews and metadata to select the most suitable one.
 - Search functionality for quick filtering by partial names or keywords.
 
 ### Configuration Tab
+
 - Change the default model or add new ones from PromptingTools.
 - Modify the default system prompt used when not employing a template.
+
+### Meta-Prompting Tab
+
+- An experimental meta-prompting experience based on [arxiv](https://arxiv.org/pdf/2401.12954).
+- The model calls different "experts" to solve the provided tasks.
+
+### Prompt Builder Tab
+
+- Generate prompt templates (for use in Chat) from a brief description of a task.
+- Generate multiple templates at once to choose from.
+- Iterate all of them by providing more inputs in the text field.
+- Once you're done, click "Apply in Chat" to jump to the normal chat (use as any other template, eg, fill in variables at the top).
 
 And rich logging in the REPL to see what the GUI is doing under the hood!
 

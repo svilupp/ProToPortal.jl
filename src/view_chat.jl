@@ -105,52 +105,99 @@ function tab_chat_messages()
         [
             htmldiv([
                 messagecard("{{item.content}}", title = "{{item.title}}";
-                    card_props = [:class => R"item.class"]),
-                quasar(:popup__edit,
-                    v__model = "item.content",
-                    v__slot = "scope",
-                    buttons = true,
-                    fit = true,
-                    style != "{ width: '100%', height: '100%' }",
+                    card_props = [:class => R"item.class"]),            ##
+                ## quasar(:popup__edit,
+                ##     v__model = "item.content",
+                ##     v__slot = "scope",
+                ##     buttons = true,
+                ##     fit = true,
+                ##     style != "{ width: '100%', height: '100%' }",
+                ##     [
+                ##         S.textarea(v__model = "scope.value",
+                ##         style = "width: 100%; height: 100%; min-height: 400px;",
+                ##         autofocus = "", @on("keyup.enter.ctrl", "scope.set"),
+                ##         @on("keyup.enter.stop",
+                ##             ""))
+                ##     ])
+                btngroup(flat = true, class = "absolute bottom-0 right-0",
                     [
-                        S.textarea(v__model = "scope.value",
-                        style = "width: 100%; height: 100%; min-height: 400px;",
-                        autofocus = "", @on("keyup.enter.ctrl", "scope.set"),
-                        @on("keyup.enter.stop",
-                            ""))
+                        btn(flat = true, round = true, size = "xs",
+                            icon = "content_copy", @click("copyToClipboard(index)")),
+                        btn(flat = true, round = true, size = "xs",
+                            icon = "edit", @click("""chat_edit_show = true;
+                            chat_edit_content = item.content;
+                            chat_edit_index = index;
+                            """)),
+                        ## show only for the last, no confirmation required
+                        btn(flat = true, round = true, size = "xs",
+                            icon = "delete", @iif("index == conv_displayed.length-1"),
+                            @click(:chat_rm_last_msg)
+                        )
                     ])
             ]),
-            btngroup(flat = true, class = "absolute bottom-0 right-0",
+            S.dialog(v__model = :chat_edit_show, no__focus = false,
+                full__width = true, full__height = true,
                 [
-                    btn(flat = true, round = true, size = "xs",
-                        icon = "content_copy", @click("copyToClipboard(index)")),
-                    ## show only for the last, no confirmation required
-                    btn(flat = true, round = true, size = "xs",
-                        icon = "delete", @iif("index == conv_displayed.length-1"),
-                        @click(:chat_rm_last_msg)
-                    )
-                ])]
+                ## style = "width: 700px; max-width: 80vw;",
+                    card(
+                    [
+                    card_section(style = "flex-grow: 1; overflow-y: auto;",
+                        [
+                            textfield(
+                            "Message Editor (click Save to save it, click elsewhere to cancel)", v__model = :chat_edit_content,
+                            type = "textarea", autogrow = true, outlined = true,
+                            style = "width: 100%; height: 100%;",
+                            @on("keyup.enter.ctrl", "saveEdits()"))
+                        ]),
+                    card_actions([
+                        btn("Save", @click("saveEdits()"))
+                    ])
+                ])
+                ]),
+            row(class = "absolute bottom--4 right-0",
+                [space(),
+                    span("{{chat_convo_tokens}}",
+                        class = "text-xs text-gray-500 text-right")],
+                @iif("index == conv_displayed.length-1"))]
     )
 end
 
 function tab_chat_input()
-    htmldiv(class = "input-group",
-        [
-            textfield("Enter your question here...", :chat_question,
-                disable = :chat_disabled,
-                type = "textarea",
-                ## change to multi-line text area
-                @on("keyup.enter.ctrl",
-                    "chat_submit = true")),
-            cell(class = "flex",
-                [
-                    btn("Submit", @click(:chat_submit), disable = :chat_submit),
-                    spinner(
-                        color = "primary",
-                        size = "3em", @iif(:chat_submit)),
-                    btn("New Chat", @click(:chat_reset))
-                ])
-        ])
+    [
+        htmldiv(class = "input-group",
+            [
+                textfield("Enter your question here...", :chat_question,
+                    v__model = :chat_question,
+                    disable = :chat_disabled,
+                    type = "textarea",
+                    @on(:input, "updateLengthChat()"),
+                    ## change to multi-line text area
+                    @on("keyup.enter.ctrl",
+                        "chat_submit = true")),
+                cell(class = "flex",
+                    [
+                        btn("Submit", @click(:chat_submit), disable = :chat_submit),
+                        spinner(
+                            color = "primary",
+                            size = "3em", @iif(:chat_submit)),
+                        btn("New Chat", @click(:chat_reset)),
+                        btn(@click("toggleRecording"),
+                            label = R"is_recording ? 'Stop' : 'Record'"  ## color = R"is_recording ? 'negative' : 'primary'"
+                        ),
+                        space(),
+                        span("{{chat_question_tokens}}",
+                            class = "text-xs text-gray-500 text-right")])]),
+        ## Shared hidden assets
+        uploader(multiple = false,
+            maxfiles = 10,
+            autoupload = true,
+            hideuploadbtn = true,
+            label = "Upload",
+            nothumbnails = true,
+            ref = "uploader",
+            style = "display: none; visibility: hidden;"
+        )
+    ]
 end
 
 ## The overall Chat tab
