@@ -1,9 +1,9 @@
 "Saves the current conversation to a history record and, optionally, also to the disk."
 function PT.save_conversation(
-        conv_displayed::Vector{Dict{Symbol, Any}}; save::Bool = true, save_path::String = "",
+        conv_displayed::Vector{T}; save::Bool = true, save_path::String = "",
         model::String = "", variables::Vector{Dict{Symbol, Any}} = Vector{Dict{
             Symbol, Any}}(),
-        file_prefix::String = "conversation")
+        file_prefix::String = "conversation") where {T <: Dict{Symbol, <:Any}}
     timestamp = Dates.format(now(), "YYYYmmdd_HHMMSS")
     name = "Conv. @ $timestamp"
     ## update the chat with edits by the user

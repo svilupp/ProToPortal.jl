@@ -21,6 +21,14 @@ function tab_meta()
         tab_meta_input()
     ]
 end
+function tab_builder()
+    [
+        h3("Prompt Builder"),
+        tab_builder_settings(),
+        tab_builder_messages(),
+        tab_builder_input()
+    ]
+end
 function tab_history()
     [
         h3("History of Old Conversations"),
@@ -131,17 +139,24 @@ function ui()
                             [
                                 itemsection(avatar = true, icon("groups")),
                                 itemsection("Meta-Prompting")
+                            ]),
+                        item(
+                            clickable = "", vripple = "", @click("selected_page = 'builder'"),
+                            [
+                                itemsection(avatar = true, icon("construction")),
+                                itemsection("Prompt Builder")
                             ])
                     ]
                 )),
             page_container(class = "mx-8",
                 [
                     Html.div(class = "", @iif("selected_page == 'chat'"), tab_chat()),
-                    Html.div(class = "", @iif("selected_page == 'meta'"), tab_meta()),
                     Html.div(class = "", @iif("selected_page == 'history'"), tab_history()),
                     Html.div(
                         class = "", @iif("selected_page == 'templates'"), tab_templates()),
-                    Html.div(class = "", @iif("selected_page == 'config'"), tab_config())
+                    Html.div(class = "", @iif("selected_page == 'config'"), tab_config()),
+                    Html.div(class = "", @iif("selected_page == 'meta'"), tab_meta()),
+                    Html.div(class = "", @iif("selected_page == 'builder'"), tab_builder())
                 ]),
             quasar(:footer, reveal = true, bordered = false,
                 class = "bg-white text-primary text-caption text-center",

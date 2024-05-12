@@ -1,4 +1,5 @@
 module App
+using Base64
 using ProToPortal
 using PromptingTools
 const PT = PromptingTools
@@ -69,9 +70,19 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in chat_auto_reply_count = 0
     # chat
     @in conv_displayed = Dict{Symbol, Any}[]
+    @in chat_edit_show = false
+    @in chat_edit_content = ""
+    @in chat_edit_save = false
+    @in chat_edit_index = 0
+    @in is_recording = false
+    @in audio_chunks = []
+    @in mediaRecorder = nothing
+    @in channel_ = nothing
     # Enter text
     @in chat_question = ""
     @out chat_disabled = false
+    @out chat_question_tokens = ""
+    @out chat_convo_tokens = ""
     # Select template
     @in chat_advanced_expanded = false
     @in chat_template_expanded = false
@@ -92,6 +103,16 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in meta_rounds_current = 0
     @in meta_displayed = Dict{Symbol, Any}[]
     @in meta_rm_last_msg = false
+    ## Prompt Builder
+    @in builder_apply = false
+    @in builder_submit = false
+    @in builder_reset = false
+    @in builder_disabled = false
+    @in builder_question = ""
+    @in builder_tabs = Dict{Symbol, Any}[]
+    @in builder_tab = "tab1"
+    @in builder_model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
+    @in builder_samples = 3
     # Template browser
     @in template_filter = ""
     @in template_submit = false
@@ -231,6 +252,34 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         chat_reset = true
         conv_displayed = conv_displayed_temp
     end
+    @onchange conv_displayed begin
+        chat_convo_tokens = if isempty(conv_displayed)
+            ""
+        elseif PT.isaimessage(conv_displayed[end][:message])
+            msg = conv_displayed[end][:message]
+            "Tokens: $(sum(msg.tokens)), Cost: \$$(round(msg.cost;digits=2))"
+        else
+            ""
+        end
+    end
+    ## Chat Speech-to-text
+    @onchange fileuploads begin
+        if !isempty(fileuploads)
+            @info "File was uploaded: " fileuploads["path"]
+            filename = base64encode(fileuploads["name"])
+            try
+                fn_new = fileuploads["path"] * ".wav"
+                mv(fileuploads["path"], fn_new; force = true)
+                chat_question = openai_whisper(fn_new)
+                rm(fn_new; force = true)
+                Base.run(__model__, "this.copyToClipboardText(this.chat_question);")
+            catch e
+                @error "Error processing file: $e"
+                notify(__model__, "Error processing file: $(fileuploads["name"])")
+            end
+            fileuploads = Dict{AbstractString, AbstractString}()
+        end
+    end
     ### Meta-prompting
     @onbutton meta_submit begin
         meta_disabled = true
@@ -272,6 +321,71 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         pop!(meta_displayed)
         meta_displayed = meta_displayed
     end
+    ### Prompt Builder
+    @onbutton builder_submit begin
+        builder_disabled = true
+        @info "> Prompt Builder Triggered - generating $(builder_samples) samples"
+        first_run = isempty(builder_tabs)
+        for i in 1:builder_samples
+            if first_run
+                ## Generate the first version
+                conv_current = send_to_model(
+                    :PromptGeneratorBasic; task = builder_question, model = builder_model)
+                new_sample = Dict(:name => "tab$(i)",
+                    :label => "Sample $(i)",
+                    :display => [msg2display(msg; id)
+                                 for (id, msg) in enumerate(conv_current)])
+                ## add new sample
+                builder_tabs = push!(builder_tabs, new_sample)
+            else
+                ## Generate the future iterations
+                current_tab = builder_tabs[i]
+                conv = prepare_conversation(
+                    current_tab[:display]; question = builder_question)
+                conv_current = send_to_model(
+                    conv; model = builder_model)
+                ## update the tab
+                current_tab[:display] = [msg2display(msg; id)
+                                         for (id, msg) in enumerate(conv_current)]
+                builder_tabs[i] = current_tab
+                builder_tabs = builder_tabs
+            end
+        end
+
+        builder_disabled, builder_question = false, ""
+    end
+    @onbutton builder_reset begin
+        @info "> Prompt Builder Reset!"
+        builder_tabs = empty!(builder_tabs)
+        builder_disabled, builder_question = false, ""
+    end
+    @onbutton builder_apply begin
+        @info "> Applying Prompt Builder!"
+        builder_msg = filter(x -> x[:name] == builder_tab, builder_tabs) |> only
+        aimsg = builder_msg[:display][end][:message]
+        instructions, inputs = parse_builder(aimsg)
+        if isempty(instructions) && isempty(inputs)
+            notify(__model__, "Parsing failed! Retry...")
+        else
+            conv_current = if isempty(inputs)
+                notify(__model__, "Parsing failed! Expect bad results / edit as needed!")
+                ## slap all instructions into user message
+                [PT.SystemMessage(system_prompt), PT.UserMessage(instructions)]
+            else
+                ## turn into sytem and user message
+                [PT.SystemMessage(instructions), PT.UserMessage(inputs)]
+            end
+            conv_displayed = [msg2display(msg; id)
+                              for (id, msg) in enumerate(conv_current)]
+            ## show the variables to fill in by the user -- use the last message / UserMessage
+            chat_template_expanded = true
+            chat_template_variables = [Dict(:id => id, :variable => String(sym),
+                                           :content => "")
+                                       for (id, sym) in enumerate(conv_current[end].variables)]
+            ## change page to chat
+            selected_page = "chat"
+        end
+    end
     ### Template browsing behavior
     @onbutton template_submit begin
         @info "> Template filter: $template_filter"
@@ -306,10 +420,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         end
     end
 end
-## TODO: add cost tracking on configuration pages + token tracking
-## TODO: add RAG/knowledge loading from folder or URL
-# Required for the JS events
-
+### JAVASCRIPT SECTION ### 
 # set focus to the first variable when it changes
 @watch begin
     raw"""
@@ -329,6 +440,16 @@ end
         if (this.conv_displayed.length==index) {
             console.log("woowza");
         }
+    },
+    // saves edits made in the chat dialog
+    saveEdits(index) {
+        this.chat_edit_show = false;
+        this.conv_displayed[this.chat_edit_index].content = this.chat_edit_content;
+        this.chat_edit_content = "";
+    },
+    updateLengthChat() {
+        const tokens = Math.round(this.chat_question.length / 3.5);
+        this.chat_question_tokens = `Approx. tokens: ${tokens}`;
     },
     focusTemplateSelect() {
         this.$nextTick(() => {
@@ -387,6 +508,56 @@ end
         el.select();                                    // Select the <textarea> content
         document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
         document.body.removeChild(el);                  // Remove the <textarea> element
+    },
+    copyToClipboardText(str) {
+        const el = document.createElement('textarea');  // Create a <textarea> element
+        el.value = str;                                 // Set its value to the string that you want copied
+        el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+        el.style.position = 'absolute';                 
+        el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+        document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+        el.select();                                    // Select the <textarea> content
+        document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+        document.body.removeChild(el);                  // Remove the <textarea> element
+    },
+    async toggleRecording() {
+        if (!this.is_recording) {
+          this.startRecording()
+        } else {
+          this.stopRecording()
+        }
+    },
+    async startRecording() {
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          this.is_recording = true
+          this.mediaRecorder = new MediaRecorder(stream);
+          this.mediaRecorder.start();
+          this.mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(this.audio_chunks, { type: 'audio/wav' });
+            this.is_recording = false;
+
+            // upload via uploader
+            const file = new File([audioBlob], 'test.wav');
+            this.$refs.uploader.addFiles([file], 'test.wav');
+            this.$refs.uploader.upload(); // Trigger the upload
+            console.log("Uploaded WAV");
+            this.$refs.uploader.reset();
+            this.audio_chunks=[];
+
+          };
+          this.mediaRecorder.ondataavailable = event => {
+            this.audio_chunks.push(event.data);
+          };
+        })
+        .catch(error => console.error('Error accessing microphone:', error));
+    },
+    stopRecording() {
+      if (this.mediaRecorder) {
+        this.mediaRecorder.stop();
+      } else {
+        console.error('MediaRecorder is not initialized');
+      }
     }
     """
 end

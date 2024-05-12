@@ -92,6 +92,18 @@ For a preview, see the video: `docs/src/videos/screen-capture-code-fixing.mp4`
 - Change the default model or add new ones from PromptingTools.
 - Modify the default system prompt used when not employing a template.
 
+### Meta-Prompting Tab
+
+- An experimental meta-prompting experience based on [arxiv](https://arxiv.org/pdf/2401.12954).
+- The model calls different "experts" to solve the provided tasks.
+
+### Prompt Builder Tab
+
+- Generate prompt templates (for use in Chat) from a brief description of a task.
+- Generate multiple templates at once to choose from.
+- Iterate all of them by providing more inputs in the text field.
+- Once you're done, click "Apply in Chat" to jump to the normal chat (use as any other template, eg, fill in variables at the top).
+
 And rich logging in the REPL to see what the GUI is doing under the hood!
 
 ## Alternatives

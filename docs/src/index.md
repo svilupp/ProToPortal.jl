@@ -11,14 +11,11 @@ hero:
     alt: Portal Icon
   actions:
     - theme: brand
-      text: Get Started
-      link: /getting_started
+      text: Introduction
+      link: /introduction
     - theme: alt
-      text: How It Works
-      link: /how_it_works
-    - theme: alt
-      text: F.A.Q.
-      link: /frequently_asked_questions
+      text: Reference
+      link: /reference
     - theme: alt
       text: View on GitHub
       link: https://github.com/svilupp/ProToPortal.jl
