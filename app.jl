@@ -111,6 +111,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in builder_question = ""
     @in builder_tabs = Dict{Symbol, Any}[]
     @in builder_tab = "tab1"
+    @in builder_detailed_view = false
     @in builder_model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
     @in builder_samples = 3
     # Template browser
@@ -151,7 +152,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     end
     @onbutton chat_reset begin
         @info "> Chat Reset!"
-        record = save_conversation(
+        record = save_conversation(ConvRecord(),
             conv_displayed; save = HISTORY_SAVE, save_path = HISTORY_DIR,
             variables = chat_template_variables, model = model)
         history = push!(history, record)
@@ -306,7 +307,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     end
     @onbutton meta_reset begin
         @info "> Meta-Prompting Reset!"
-        record = save_conversation(
+        record = save_conversation(ConvRecord(),
             meta_displayed; save = HISTORY_SAVE, save_path = HISTORY_DIR,
             model = model, file_prefix = "conversation__meta")
         history = push!(history, record)
@@ -331,8 +332,11 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
                 ## Generate the first version
                 conv_current = send_to_model(
                     :PromptGeneratorBasic; task = builder_question, model = builder_model)
+                instructions, inputs = parse_builder(PT.last_message(conv_current))
                 new_sample = Dict(:name => "tab$(i)",
                     :label => "Sample $(i)",
+                    :instructions => instructions,
+                    :inputs => inputs,
                     :display => [msg2display(msg; id)
                                  for (id, msg) in enumerate(conv_current)])
                 ## add new sample
@@ -347,6 +351,9 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
                 ## update the tab
                 current_tab[:display] = [msg2display(msg; id)
                                          for (id, msg) in enumerate(conv_current)]
+                instructions, inputs = parse_builder(PT.last_message(conv_current))
+                current_tab[:instructions] = instructions
+                current_tab[:inputs] = inputs
                 builder_tabs[i] = current_tab
                 builder_tabs = builder_tabs
             end
@@ -362,8 +369,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @onbutton builder_apply begin
         @info "> Applying Prompt Builder!"
         builder_msg = filter(x -> x[:name] == builder_tab, builder_tabs) |> only
-        aimsg = builder_msg[:display][end][:message]
-        instructions, inputs = parse_builder(aimsg)
+        instructions, inputs = builder_msg[:instructions], builder_msg[:inputs]
         if isempty(instructions) && isempty(inputs)
             notify(__model__, "Parsing failed! Retry...")
         else

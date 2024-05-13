@@ -24,7 +24,7 @@ export render_messages, render_template_messages
 export conversation2transcript, parse_critic, parse_builder, load_conversations_from_dir
 include("utils.jl")
 
-export save_conversation
+export ConvRecord, save_conversation
 include("serialization.jl")
 
 export flash, flash_has_message

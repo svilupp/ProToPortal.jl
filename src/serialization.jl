@@ -1,5 +1,7 @@
+struct ConvRecord end
+
 "Saves the current conversation to a history record and, optionally, also to the disk."
-function PT.save_conversation(
+function PT.save_conversation(::ConvRecord,
         conv_displayed::Vector{T}; save::Bool = true, save_path::String = "",
         model::String = "", variables::Vector{Dict{Symbol, Any}} = Vector{Dict{
             Symbol, Any}}(),

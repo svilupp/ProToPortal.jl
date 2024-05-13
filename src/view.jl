@@ -23,7 +23,10 @@ function tab_meta()
 end
 function tab_builder()
     [
-        h3("Prompt Builder"),
+        h3("Template Builder"),
+        span(
+            "Provide a task to build the template for, then click Apply In Chat to use it in Chat.";
+            class = "text-sm italic"),
         tab_builder_settings(),
         tab_builder_messages(),
         tab_builder_input()
