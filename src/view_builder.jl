@@ -6,6 +6,7 @@ function tab_builder_settings()
         dense = true,
         densetoggle = true,
         expandseparator = true,
+        class = "py-5",
         headerstyle = "bg-blue-1", [
             row(p("Prompt Builder Settings", class = "text-lg text-weight-bold pt-4")),
             row([select(:builder_model, options = :model_options, label = "Model")]),
@@ -40,9 +41,20 @@ function tab_builder_messages()
                     name = R"tab.name",
                     ## show only the last message!
                     [
-                        messagecard("{{tab.display.at(-1).content}}",
-                        title = "{{tab.display.at(-1).title}}";
-                        card_props = [:class => R"tab.display.at(-1).class"])
+                        toggle(
+                            "Detailed View", :builder_detailed_view, color = "secondary"),
+                        htmldiv(@iif(:builder_detailed_view),
+                            messagecard("{{tab.display.at(-1).content}}";
+                                title = "{{tab.display.at(-1).title}}",
+                                card_props = [:class => R"tab.display.at(-1).class"])),
+                        htmldiv(@iif(R"!builder_detailed_view"),
+                            [
+                                messagecard("{{tab.instructions}}",
+                                    title = "System Instructions"),
+                                messagecard("{{tab.inputs}}",
+                                    title = "Inputs/Placeholders",
+                                    card_props = [:class => "mt-5"])
+                            ])
                     ])
                 ]),
             tabgroup(:builder_tab,
