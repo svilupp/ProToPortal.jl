@@ -15,7 +15,7 @@ Aqua = "0.7"
 Dates = "<0.0.1, 1"
 GenieFramework = "2.1"
 GenieSession = "1"
-PromptingTools = "0.23"
+PromptingTools = "0.25"
 Test = "<0.0.1, 1"
 julia = "1.10"
 
