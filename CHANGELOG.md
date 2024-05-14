@@ -11,7 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Prompt Builder tab
 - Added a "Detailed view" button to toggle between a compact view and a detailed view
 
+Configuration
+- Changed default OpenAI model to GPT-4 Omni
+
 ### Fixed
+- Fixed a piracy warning in Aqua
 
 ## [0.2.0]
 

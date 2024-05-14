@@ -45,13 +45,13 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     ## @in chat_tracker_tokens_in = 0
     ## @in chat_tracker_tokens_out = 0
     ## @in chat_tracker_cost = 0.0
-    @in model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
+    @in model = isempty(PT.GROQ_API_KEY) ? "gpt4o" : "gllama370"
     @in model_input = ""
     @in model_submit = false
     ## gllama3 - Llama3 8b on Groq, gllama370 - Llama3 70b on Groq, 
     ## claude-x are Opus/Sonnet/Haiku from Anthropic Claude3, tmixtral is Mixtral 8x7b on Together.ai, 
     ## ollama3 is Llama3 8b on Ollama
-    @out model_options = ["gpt4t", "gpt3t", "gllama3", "gllama370",
+    @out model_options = ["gpt4o", "gpt4t", "gpt3t", "gllama3", "gllama370",
         "ollama3", "claudeo", "claudes", "claudeh", "tmixtral"]
     @in system_prompt = "You are a helpful assistant."
     @in chat_temperature = 0.7
@@ -112,7 +112,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in builder_tabs = Dict{Symbol, Any}[]
     @in builder_tab = "tab1"
     @in builder_detailed_view = false
-    @in builder_model = isempty(PT.GROQ_API_KEY) ? "gpt4t" : "gllama370"
+    @in builder_model = isempty(PT.GROQ_API_KEY) ? "gpt4o" : "gllama370"
     @in builder_samples = 3
     # Template browser
     @in template_filter = ""
