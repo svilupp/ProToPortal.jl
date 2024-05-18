@@ -16,6 +16,7 @@ Prompt Builder tab
 
 Configuration
 - Changed default OpenAI model to GPT-4 Omni
+- Improve grid layout and wider prompt textboxes
 
 ### Fixed
 - Fixed a piracy warning in Aqua
