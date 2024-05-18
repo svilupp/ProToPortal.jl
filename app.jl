@@ -53,6 +53,9 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     ## ollama3 is Llama3 8b on Ollama
     @out model_options = ["gpt4o", "gpt4t", "gpt3t", "gllama3", "gllama370",
         "ollama3", "claudeo", "claudes", "claudeh", "tmixtral"]
+    @in model_stt = isempty(PT.GROQ_API_KEY) ? "whisper-1" : "whisper-large-v3"
+    @in model_options_stt = ["whisper-1", "whisper-large-v3"]
+    @in stt_prompt = "Jan, Ann, Quasar, GenAI" # prompt for Speech-to-text enhances the quality and spelling
     @in system_prompt = "You are a helpful assistant."
     @in chat_temperature = 0.7
     @in chat_code_eval = false
@@ -77,7 +80,6 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in is_recording = false
     @in audio_chunks = []
     @in mediaRecorder = nothing
-    @in channel_ = nothing
     # Enter text
     @in chat_question = ""
     @out chat_disabled = false
@@ -265,21 +267,23 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     end
     ## Chat Speech-to-text
     @onchange fileuploads begin
-        if !isempty(fileuploads)
-            @info "File was uploaded: " fileuploads["path"]
-            filename = base64encode(fileuploads["name"])
-            try
-                fn_new = fileuploads["path"] * ".wav"
-                mv(fileuploads["path"], fn_new; force = true)
-                chat_question = openai_whisper(fn_new)
-                rm(fn_new; force = true)
-                Base.run(__model__, "this.copyToClipboardText(this.chat_question);")
-            catch e
-                @error "Error processing file: $e"
-                notify(__model__, "Error processing file: $(fileuploads["name"])")
-            end
-            fileuploads = Dict{AbstractString, AbstractString}()
+        isempty(fileuploads) && return
+        Base.run(__model__, raw"console.log('wav file upload received');")
+        @info "> File was uploaded: $(fileuploads["path"])"
+        try
+            fn_new = fileuploads["path"] * ".wav"
+            mv(fileuploads["path"], fn_new; force = true)
+            chat_question = speech_to_text(
+                fn_new; model = model_stt, prompt = stt_prompt) |> strip
+            rm(fn_new; force = true)
+            Base.run(__model__, raw"this.copyToClipboardText(this.chat_question);")
+        catch e
+            @error "Error processing file: $e"
+            notify(__model__, "Error processing file: $(fileuploads["name"])")
         end
+        Base.run(__model__, raw"this.$refs.uploader.reset()")
+        audio_chunks = []
+        empty!(fileuploads)
     end
     ### Meta-prompting
     @onbutton meta_submit begin
@@ -438,6 +442,22 @@ end
 
     """
 end
+# Required for the uploader component
+@client_data begin
+    channel_ = ""
+end
+# add a toJSON method for File objects -- for the uploader component
+@mounted """
+File.prototype.toJSON = function() {
+    return {
+        lastModified: this.lastModified,
+        name: this.name,
+        size: this.size,
+        type: this.type,
+        webkitRelativePath: this.webkitRelativePath
+    };
+}
+"""
 @methods begin
     raw"""
     buttonFunc(index) {
@@ -538,23 +558,20 @@ end
         .then(stream => {
           this.is_recording = true
           this.mediaRecorder = new MediaRecorder(stream);
+          this.mediaRecorder.onstart = () => { this.is_recording = true };
+          this.mediaRecorder.onstop = () => { this.is_recording = false };
           this.mediaRecorder.start();
-          this.mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(this.audio_chunks, { type: 'audio/wav' });
-            this.is_recording = false;
-
-            // upload via uploader
-            const file = new File([audioBlob], 'test.wav');
-            this.$refs.uploader.addFiles([file], 'test.wav');
-            this.$refs.uploader.upload(); // Trigger the upload
-            console.log("Uploaded WAV");
-            this.$refs.uploader.reset();
-            this.audio_chunks=[];
-
-          };
           this.mediaRecorder.ondataavailable = event => {
-            this.audio_chunks.push(event.data);
-          };
+                console.log('speech data available: ', event.data.size, 'bytes');
+                this.audio_chunks.push(event.data);
+                const audioBlob = new Blob(this.audio_chunks, { type: 'audio/wav' });
+                
+                // upload via uploader
+                const filename = 'audio.wav';
+                const file = new File([audioBlob], filename);
+                this.$refs.uploader.addFiles([file]);
+                console.log(`Uploading audio as '${filename}' ...`);
+            };
         })
         .catch(error => console.error('Error accessing microphone:', error));
     },

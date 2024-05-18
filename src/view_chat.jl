@@ -163,41 +163,41 @@ function tab_chat_messages()
 end
 
 function tab_chat_input()
-    [
-        htmldiv(class = "input-group",
-            [
-                textfield("Enter your question here...", :chat_question,
-                    v__model = :chat_question,
-                    disable = :chat_disabled,
-                    type = "textarea",
-                    @on(:input, "updateLengthChat()"),
-                    ## change to multi-line text area
-                    @on("keyup.enter.ctrl",
-                        "chat_submit = true")),
-                cell(class = "flex",
-                    [
-                        btn("Submit", @click(:chat_submit), disable = :chat_submit),
-                        spinner(
-                            color = "primary",
-                            size = "3em", @iif(:chat_submit)),
-                        btn("New Chat", @click(:chat_reset)),
-                        btn(@click("toggleRecording"),
-                            label = R"is_recording ? 'Stop' : 'Record'"  ## color = R"is_recording ? 'negative' : 'primary'"
-                        ),
-                        space(),
-                        span("{{chat_question_tokens}}",
-                            class = "text-xs text-gray-500 text-right")])]),
-        ## Shared hidden assets
-        uploader(multiple = false,
-            maxfiles = 10,
-            autoupload = true,
-            hideuploadbtn = true,
-            label = "Upload",
-            nothumbnails = true,
-            ref = "uploader",
-            style = "display: none; visibility: hidden;"
-        )
-    ]
+    htmldiv(class = "input-group",
+        [
+            textfield("Enter your question here...", :chat_question,
+                v__model = :chat_question,
+                disable = :chat_disabled,
+                type = "textarea",
+                @on(:input, "updateLengthChat()"),
+                ## change to multi-line text area
+                @on("keyup.enter.ctrl",
+                    "chat_submit = true")),
+            cell(class = "flex",
+                [
+                    btn("Submit", @click(:chat_submit), disable = :chat_submit),
+                    spinner(
+                        color = "primary",
+                        size = "3em", @iif(:chat_submit)),
+                    btn("New Chat", @click(:chat_reset)),
+                    btn(@click("toggleRecording"),
+                        icon = R"is_recording ? 'mic_off' : 'mic'",
+                        color = R"is_recording ? 'negative' : 'white'",
+                        textcolor = R"is_recording ? 'white' : 'st-text-1'"
+                    ),
+                    space(),
+                    span("{{chat_question_tokens}}",
+                        class = "text-xs text-gray-500 text-right")]),
+            ## Shared hidden assets
+            uploader(multiple = false,
+                maxfiles = 10,
+                autoupload = true,
+                hideuploadbtn = true,
+                label = "Upload",
+                nothumbnails = true,
+                ref = "uploader",
+                @on(:uploaded, :uploaded),
+                style = "display: none; visibility: hidden;"
+            )
+        ])
 end
-
-## The overall Chat tab

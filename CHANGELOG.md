@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+Chat tab
+- Added support for Groq's speech-to-text model for much lower latency
+
 Prompt Builder tab
 - Added a "Detailed view" button to toggle between a compact view and a detailed view
 
@@ -16,6 +19,7 @@ Configuration
 
 ### Fixed
 - Fixed a piracy warning in Aqua
+- Improved subtle bugs in the Speech-to-text functionality on chat tab
 
 ## [0.2.0]
 
