@@ -116,6 +116,9 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
     @in builder_detailed_view = false
     @in builder_model = isempty(PT.GROQ_API_KEY) ? "gpt4o" : "gllama370"
     @in builder_samples = 3
+    @in builder_template = "PromptGeneratorBasic"
+    @out builder_tpl_options = filter(
+        x -> occursin("PromptGenerator", string(x)), keys(PT.TEMPLATE_STORE))
     # Template browser
     @in template_filter = ""
     @in template_submit = false
@@ -335,7 +338,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
             if first_run
                 ## Generate the first version
                 conv_current = send_to_model(
-                    :PromptGeneratorBasic; task = builder_question, model = builder_model)
+                    Symbol(builder_template); task = builder_question, model = builder_model)
                 instructions, inputs = parse_builder(PT.last_message(conv_current))
                 new_sample = Dict(:name => "tab$(i)",
                     :label => "Sample $(i)",
