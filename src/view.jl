@@ -82,10 +82,15 @@ function tab_config()
         row(class = "col-6 pb-5",
             textfield("Add a new model", :model_input, hint = "Confirm with ENTER",
                 @on("keyup.enter", "model_submit = !model_submit"))),
-        separator(),
-        cell([
-            textfield("Default System Prompt", :system_prompt,
+        row([textfield("Default System Prompt", :system_prompt,
             hint = "Will be sent to the AI model as the first instruction.")
+        ]),
+        separator(),
+        row(class = "",
+            select(
+                :model_stt, options = :model_options_stt, label = "Speech-to-Text Model")),
+        row([textfield("Speech-to-Text Prompt", :stt_prompt,
+            hint = "Provided often mispelled words or showcase the desired writing style.")
         ])        ## TODO: stats - tokens + cost
     ]
 end

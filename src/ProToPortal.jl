@@ -30,7 +30,7 @@ include("serialization.jl")
 export flash, flash_has_message
 include("flash.jl")
 
-export openai_whisper
+export speech_to_text
 include("speech_to_text.jl")
 
 export messagecard, templatecard
