@@ -9,7 +9,7 @@ function tab_chat()
         tab_chat_messages(),
         separator(@iif("!!conv_displayed.length")),
         tab_chat_input()
-    ]
+    ] |> htmldiv
 end
 function tab_meta()
     [
@@ -19,7 +19,7 @@ function tab_meta()
         tab_meta_messages(),
         separator(@iif("!!meta_displayed.length")),
         tab_meta_input()
-    ]
+    ] |> htmldiv
 end
 function tab_builder()
     [
@@ -30,7 +30,7 @@ function tab_builder()
         tab_builder_settings(),
         tab_builder_messages(),
         tab_builder_input()
-    ]
+    ] |> htmldiv
 end
 function tab_history()
     [
@@ -57,7 +57,7 @@ function tab_history()
                 btn("Fork the conversation", @click(:history_fork),
                 class = "btn btn-secondary")
             ])
-    ]
+    ] |> htmldiv
 end
 function tab_templates()
     [
@@ -74,25 +74,33 @@ function tab_templates()
                 system = "{{item.system_preview}}", user = "{{item.user_preview}}")
             ]
         )
-    ]
+    ] |> htmldiv
 end
 function tab_config()
     [h3("Configuration"),
-        row(class = "col-6", select(:model, options = :model_options, label = "Model")),
-        row(class = "col-6 pb-5",
-            textfield("Add a new model", :model_input, hint = "Confirm with ENTER",
-                @on("keyup.enter", "model_submit = !model_submit"))),
-        row([textfield("Default System Prompt", :system_prompt,
-            hint = "Will be sent to the AI model as the first instruction.")
-        ]),
-        separator(),
         row(class = "",
-            select(
-                :model_stt, options = :model_options_stt, label = "Speech-to-Text Model")),
-        row([textfield("Speech-to-Text Prompt", :stt_prompt,
-            hint = "Provided often mispelled words or showcase the desired writing style.")
-        ])        ## TODO: stats - tokens + cost
-    ]
+            [
+                cell(class = "col-5",
+                    select(:model, options = :model_options, label = "Model")),
+                cell(class = "pl-6 col-6",
+                    textfield(
+                        "Add a new model", :model_input, hint = "Confirm with ENTER",
+                        @on("keyup.enter", "model_submit = !model_submit")))
+            ]),
+        row(class = "",
+            cell([textfield("Default System Prompt", :system_prompt,
+                hint = "Will be sent to the AI model as the first instruction.")
+            ])),
+        separator(),
+        row(class = "pt-6",
+            cell(class = "col-5",
+                select(
+                    :model_stt, options = :model_options_stt, label = "Speech-to-Text Model"))),
+        row(class = "",
+            cell([textfield("Speech-to-Text Prompt", :stt_prompt,
+                hint = "Provided often mispelled words or showcase the desired writing style.")
+            ]))        ## TODO: stats - tokens + cost
+    ] |> htmldiv
 end
 
 ## Page Container
