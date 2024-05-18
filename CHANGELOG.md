@@ -13,6 +13,7 @@ Chat tab
 
 Prompt Builder tab
 - Added a "Detailed view" button to toggle between a compact view and a detailed view
+- Added an alternative template `:PromptGeneratorUpsampler` that generates a prompt template for chat without extensive examples (zero-shot prompt)
 
 Configuration
 - Changed default OpenAI model to GPT-4 Omni

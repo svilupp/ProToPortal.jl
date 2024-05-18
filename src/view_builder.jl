@@ -9,13 +9,16 @@ function tab_builder_settings()
         class = "py-5",
         headerstyle = "bg-blue-1", [
             row(p("Prompt Builder Settings", class = "text-lg text-weight-bold pt-4")),
-            row([select(:builder_model, options = :model_options, label = "Model")]),
+            row(cell([select(:builder_model, options = :model_options, label = "Model")])),
             row(class = "pt-4",
-                [p("Number of Samples"),
+                cell([
+                    p("Number of Samples"),
                     slider(
                         1:1:10, :builder_samples, labelalways = true, snap = true,
                         class = "ml-4, my-5",
-                        markers = 1)])
+                        markers = 1)])),
+            row(cell([select(:builder_template, options = :builder_tpl_options,
+                label = "Builder Template")]))
         ])
     ])
 end
