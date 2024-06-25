@@ -8,16 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Fixed
+
+## [0.3.0]
+
+### Added
 Chat tab
 - Added support for Groq's speech-to-text model for much lower latency
 
 Prompt Builder tab
 - Added a "Detailed view" button to toggle between a compact view and a detailed view
+- Allow user to choose between different Prompt Generators (see the "Prompt Builder Settings" at the top)
 - Added an alternative template `:PromptGeneratorUpsampler` that generates a prompt template for chat without extensive examples (zero-shot prompt)
 
 Configuration
 - Changed default OpenAI model to GPT-4 Omni
 - Improve grid layout and wider prompt textboxes
+
+### Updated
+- Increased PromptingTools compat to 0.33
 
 ### Fixed
 - Fixed a piracy warning in Aqua
