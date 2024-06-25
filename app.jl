@@ -165,6 +165,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
         conv_displayed = empty!(conv_displayed)
         chat_template_variables = empty!(chat_template_variables)
         chat_question, chat_auto_template, chat_template_selected = "", "", ""
+        chat_question_tokens = ""
         chat_disabled, chat_advanced_expanded, chat_template_expanded = false, false, false
         # set defaults again
         chat_code_airetry, chat_code_eval = false, false
@@ -182,7 +183,7 @@ const HISTORY_SAVE = get(ENV, "PROTO_HISTORY_SAVE", true)
                           for (id, msg) in enumerate(conv_current)]
         # remove template variables
         chat_template_variables = empty!(chat_template_variables)
-        chat_question, chat_template_selected = "", ""
+        chat_question, chat_question_tokens, chat_template_selected = "", "", ""
         # Note: keep the critic template enabled
         chat_disabled, chat_template_expanded, chat_advanced_expanded = false, false, false
         #######################
