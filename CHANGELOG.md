@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.4.0]
+
+### Added
+- Added a launcher function `launch` to make it easier to launch the app.
+- Semantic caching enabled by SemanticCaches.jl. You can change it by setting `cached=false` in the `launch()` function.
+
 ## [0.3.0]
 
 ### Added

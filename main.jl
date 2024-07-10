@@ -1,9 +1,6 @@
 using Pkg
 Pkg.activate(".")
-using GenieFramework
-ENV["GENIE_HOST"] = "127.0.0.1"
-ENV["PORT"] = "8000"
-## ENV["GENIE_ENV"] = "prod"
-include("app.jl") # hack for hot-reloading when fixing things
-Genie.loadapp();
-up(async = true);
+## Required to support semantic caching
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"
+using ProToPortal
+ProToPortal.launch(8000, "0.0.0.0"; async = false, cached = true, cache_verbose = true)
