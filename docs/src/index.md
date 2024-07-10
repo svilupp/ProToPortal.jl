@@ -54,8 +54,11 @@ It's the first Julia-focused GUI (evaluate Julia code, fix it, critique it - or 
 Clone ProToPortal, instantiate it, enable your desired settings, and streamline your LLM interactions right away:
 
 ```julia
-using Pkg; Pkg.activate("."); Pkg.instantiate(".")
-include("main.jl")
+# as a quick hack if you don't have your environment variables set up, run the below line with your OpenAI key
+# ENV["OPENAI_API_KEY"] = "<your_openai_api_key>"
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"  # required for caching
+using ProToPortal
+launch(; cached = true)
 ```
 
 Then head to your browser and go to [http://127.0.0.1:8000](http://127.0.0.1:8000) to see the app.

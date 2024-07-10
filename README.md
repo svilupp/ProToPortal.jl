@@ -32,10 +32,14 @@ using Pkg; Pkg.activate("."); Pkg.instantiate(".")
 ```julia
 # as a quick hack if you don't have your environment variables set up, run the below line with your OpenAI key
 # ENV["OPENAI_API_KEY"] = "<your_openai_api_key>"
-include("main.jl")
+ENV["DATADEPS_ALWAYS_ACCEPT"] = "true"  # required for caching
+using ProToPortal
+launch(; cached = true)
 ```
 
 Then head to your browser and go to [http://127.0.0.1:8000](http://127.0.0.1:8000) to see the app.
+
+It will now cache similar LLM requests by default (disable with `cached=false` in `launch()` function).
 
 For the purists: simply run `julia --project -t auto main.jl` in your terminal (once installed)!
 
