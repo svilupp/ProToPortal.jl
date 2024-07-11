@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a launcher function `launch` to make it easier to launch the app.
 - Semantic caching enabled by SemanticCaches.jl. You can change it by setting `cached=false` in the `launch()` function.
 
+### Fixed 
+- Fixed a bug when caching would error for certain types of HTTP body (eg, `IOBuffer`)
+
+
 ## [0.3.0]
 
 ### Added
