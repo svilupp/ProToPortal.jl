@@ -32,7 +32,9 @@ const HASH_CACHE = HashCache()
 function cache_layer(handler)
     return function (req; kw...)
         VERBOSE = Base.get(ENV, "CACHES_VERBOSE", "true") == "true"
-        if req.method == "POST" && !isempty(req.body)
+        has_body = (req.body isa IOBuffer ||
+                    (req.body isa AbstractVector && !isempty(req.body)))
+        if req.method == "POST" && has_body
             body = JSON3.read(copy(req.body))
             ## chat/completions is for OpenAI, v1/messages is for Anthropic
             if occursin("v1/chat/completions", req.target) ||
