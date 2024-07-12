@@ -59,7 +59,8 @@ function cache_layer(handler)
 
             VERBOSE && @info "Check if we can cache this request ($(length(input)) chars)"
             active_cache = length(input) > 5000 ? HASH_CACHE : SEM_CACHE
-            item = active_cache(cache_key, input; verbose = 2 * VERBOSE) # change verbosity to 0 to disable detailed logs
+            item = active_cache(
+                cache_key, input; verbose = 2 * VERBOSE, min_similarity = 0.99) # change verbosity to 0 to disable detailed logs
             if !isvalid(item)
                 VERBOSE && @info "Cache miss! Pinging the API"
                 # pass the request along to the next layer by calling `cache_layer` arg `handler`
