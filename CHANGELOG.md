@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [0.4.1]
+
+### Fixed
+- Without the length-adjustment, the semantic cache is sometimes too aggressive. It's not disabled by default to avoid unexpected behavior.
+
 ## [0.4.0]
 
 ### Added
